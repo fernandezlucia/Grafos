@@ -27,6 +27,37 @@ void imprimirListaVectores(const vector<vector<int>>& lista) {
     }
 }
 
+
+
+//CHAT GPT ME DIO ESTO SUPUESTAMENTE ES O(M+N)
+//----------------------------------------------
+
+//const int MAXN = 100000;
+//
+//vector<int> adj[MAXN + 1];
+//int vis[MAXN + 1];
+//int parent[MAXN + 1];
+//vector<int> cycle_edges;
+//
+//void dfs(int u) {
+//    vis[u] = 1;
+//    for (int v : adj[u]) {
+//        if (vis[v] == 0) {
+//            parent[v] = u;
+//            dfs(v);
+//        } else if (vis[v] == 1 && parent[u] != v) {
+//            int cur = u;
+//            cycle_edges.push_back(1);
+//            while (cur != v) {
+//                cycle_edges.back()++;
+//                cur = parent[cur];
+//            }
+//        }
+//    }
+//    vis[u] = 2;
+//}
+//
+
 void DFS(vector<vector<int>> &grafo, vector<int> &visitados, vector<int> &ciclos, vector<int> &padre, int nodo){
     visitados[nodo] = GRIS;
     
