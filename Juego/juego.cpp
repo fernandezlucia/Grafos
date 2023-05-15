@@ -40,21 +40,22 @@ void imprimirListaVectores(const vector<vector<int>>& lista) {
 //vector<int> cycle_edges;
 //
 //void dfs(int u) {
-//    vis[u] = 1;
+//    visitado[u] = GRIS;
 //    for (int v : adj[u]) {
-//        if (vis[v] == 0) {
-//            parent[v] = u;
+//        if (visitado[v] == 0) {
+//            padre[v] = u;
 //            dfs(v);
-//        } else if (vis[v] == 1 && parent[u] != v) {
-//            int cur = u;
+//        } else if (visitado[v] == GRIS && padre[u] != v) {
+//            int actual = u;
 //            cycle_edges.push_back(1);
-//            while (cur != v) {
+//            while (actual != v) {
 //                cycle_edges.back()++;
-//                cur = parent[cur];
+//                actual = padre[actual];
+//                  reinicio el ciclo con el padre del actual
 //            }
 //        }
 //    }
-//    vis[u] = 2;
+//    visitado[u] = NEGRO;
 //}
 //
 
