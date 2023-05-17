@@ -91,3 +91,45 @@ int main(int argc, char **argv){
 // si un ciclo comparte al menos un nodo con otro ciclo -> sumo la cantidad de nodos en esos ciclos en k
 // combinatorio (k 2)
 tengo la cantidad de nodos en ciclos
+
+
+
+vector<pair<int, int>> findBridges(int n) {
+    vector<pair<int, int>> bridges;
+    timer = 0;
+    for (int i = 1; i <= n; i++) {
+        visited[i] = false;
+        discovery[i] = 0;
+        low[i] = 0;
+    }
+
+    for (int i = 1; i <= n; i++) {
+        if (!visited[i]) {
+            dfs(i, -1, bridges);
+        }
+    }
+
+    return bridges;
+}
+
+
+void dfs(int u, int parent, vector<pair<int, int>>& bridges) {
+    visited[u] = true;
+    discovery[u] = low[u] = ++timer;
+
+    for (int v : adj[u]) {
+        if (v == parent)
+            continue;
+
+        if (!visited[v]) {
+            dfs(v, u, bridges);
+            low[u] = min(low[u], low[v]);
+
+            if (low[v] > discovery[u]) {
+                bridges.push_back({u, v});
+            }
+        } else {
+            low[u] = min(low[u], discovery[v]);
+        }
+    }
+}

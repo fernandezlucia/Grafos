@@ -1,0 +1,39 @@
+13 16
+1 2
+1 3
+2 3
+3 9
+3 10
+9 10
+1 4
+4 5
+5 6
+6 7
+7 1
+1 13
+13 8
+8 11
+8 12
+11 12
+
+void DFS(int u, vector<int> &visitado, vector<int> &padre, vector<int> &contar_ciclos, vector<vector<int>> &lista_de_ady, vector<int> &esta_en_ciclo) {
+    visitado[u] = GRIS;
+    for(int v : lista_de_ady[u]){
+        if (visitado[v] == BLANCO) {
+            padre[v] = u;
+            DFS(v, visitado, padre, contar_ciclos, lista_de_ady, esta_en_ciclo);
+        } 
+        else if(visitado[v] == GRIS && padre[u] != v) { // es una backedge
+            esta_en_ciclo[v]++;
+            int actual = u;
+            contar_ciclos.push_back(1);
+            while (actual != v) {
+                contar_ciclos.back()++;
+                esta_en_ciclo[actual]++;
+                actual = padre[actual];   //reinicio el ciclo con el padre del actual
+                  
+            }
+        }
+    }
+    visitado[u] = NEGRO;
+}
