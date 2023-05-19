@@ -3,13 +3,14 @@
 #include <vector>
 #include <stdio.h>
 #include <math.h>
+#include <iomanip> 
 
 using namespace std;
 
 #define BLANCO 0
 #define GRIS 1
 #define NEGRO 2
-int n, m;
+long long n, m;
 // formas de perder: cantidad de jugadas de tuki q permiten a kitu ganar
 // proba de perder = #formas de perder  / #formas de jugar ((n^2)-n)/2
 // proba de perder = 1 - (#formas de ganar / #formas de jugar)
@@ -119,7 +120,7 @@ void detectarComponentes(vector<vector<int>> &lista_de_ady, vector<int> &visitad
     int tiempo_actual = 0;
     for (int v = 0; v < n; v++) {
         if (!visitado[v]) {
-            componentes.push_back(1);
+            componentes.push_back(0);
             DFS(lista_de_ady, v, tiempo_actual, visitado, padre, componentes, time_in);
         }  
     }
@@ -149,18 +150,38 @@ int main(int argc, char **argv){
     vector<vector<int>> lista_de_ady = procesarEntrada(test_in);
     vector<int> visitado(n, BLANCO);
     vector<int> padre(n, -1);
-    vector<int> componentes(0);
+    vector<int> componentes(1,0);
     vector<int> time_in(n, 0);
     vector<bool> puente_con_parent(n, false);
 
-    imprimirListaVectores(lista_de_ady);
-    DFS(lista_de_ady, 0, 0, visitado, padre, componentes,time_in);
+    //imprimirListaVectores(lista_de_ady);
+    //cout << "entro 1" << endl;
+    DFS(lista_de_ady, 0, 0, visitado, padre, componentes, time_in);
+    //cout << "entro 2" << endl;
     int res = detectarPuentes(lista_de_ady, 0, time_in, padre, puente_con_parent);
     sacarPuentes(padre, puente_con_parent, lista_de_ady);
-    imprimirListaVectores(lista_de_ady);
+    //imprimirListaVectores(lista_de_ady);
     visitado.assign(n, BLANCO);
+    componentes.clear();
     detectarComponentes(lista_de_ady, visitado, padre, componentes, time_in);
-    printVector(componentes);
+    //printVector(componentes);
+
+    long long formas_ganar = 0;
+    for(int i = 0; i < componentes.size(); i++){
+        int k = componentes[i];
+        //cout << k << endl;
+        if(k != 1)
+            formas_ganar += (k*(k-1))/2;
+        else 
+            formas_ganar++;
+        //cout << formas_ganar << endl;
+    }
+    long long formas_jugar = (n*(n-1))/2;
+    //cout << formas_jugar << endl;
+    double proba_perder = 1 - (formas_ganar / formas_jugar);
+    cout << setprecision(5) << proba_perder << endl;
+    // proba de perder = 1 - (#formas de ganar / #formas de jugar)
+
 
     //DFS(lista_de_ady, lista_de_ady[0][0], visitado, padre, componentes);
     //printVector(esta_en_ciclo);
@@ -170,3 +191,4 @@ int main(int argc, char **argv){
     //imprimirListaVectores(lista_de_ady);
     return 0;
 }
+
