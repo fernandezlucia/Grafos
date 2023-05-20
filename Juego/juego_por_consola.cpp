@@ -20,7 +20,7 @@ void DFS(vector<vector<int>> &lista_de_ady, int u, int tiempo_actual, vector<int
     if(u == 0)
         padre[u] = u;
     for(int v : lista_de_ady[u]){
-        if (visitado[v] == BLANCO) {
+        if (visitado[v] == BLANCO){
             padre[v] = u;
             DFS(lista_de_ady, v, tiempo_actual, visitado, padre, componentes, time_in);
         } 
@@ -32,13 +32,11 @@ void DFS(vector<vector<int>> &lista_de_ady, int u, int tiempo_actual, vector<int
 int detectarPuentes(vector<vector<int>> &lista_de_ady, int v, vector<int>& time_in, const vector<int>& padre, vector<bool>& puente_con_parent){
     int cantidad = 0;
     for(int u : lista_de_ady[v]){
-        if(padre[u] == v ){
+        if(padre[u] == v )
             cantidad += detectarPuentes(lista_de_ady, u, time_in, padre, puente_con_parent);
-        }
         else {
-            if(time_in[v]>time_in[u] && padre[v] != u){
+            if(time_in[v]>time_in[u] && padre[v] != u)
                 cantidad++;
-            }
             if(time_in[v]<time_in[u])
                 cantidad--;
         }
@@ -91,7 +89,6 @@ int main(){
         lista_de_ady[nodo2 -1].push_back(nodo1-1);
     }
 
-    //vector<vector<int>> lista_de_ady = procesarEntrada(test_in);
     vector<int> visitado(n, BLANCO);
     vector<int> padre(n, -1);
     vector<int> componentes(1,0);
@@ -114,6 +111,7 @@ int main(){
             formas_ganar += (k*(k-1))/2;
         }
     }
+    
     long long int formas_jugar = (n*(n-1))/2;
     long double division = (formas_ganar*1.0) / formas_jugar;
     long double proba_perder = 1 - division;
