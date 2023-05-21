@@ -8,13 +8,16 @@
 
 using namespace std;
 
-int n, m;
+int n;
+int m;
+
+int c;
 vector<bool> tiene_padre;
 
 void imprimirListaVectores(const vector<vector<int>>& lista) {
     for (const auto& vec : lista) {
         for (const auto& elem : vec) {
-            cout << elem +1<< " ";
+            cout << elem + 1 << " ";
         }
         cout << endl;
     }
@@ -52,6 +55,7 @@ int BFS(int d, vector<vector<int>> &pares_de_caida, vector<int> &caidos){
             cola.push(v);
         }
     }
+
     return hijos_caidos;
 }
 //si todos sus hijos estaban caidos o si no tiene hijos no lo quiero pushear
@@ -64,21 +68,29 @@ int BFS(int d, vector<vector<int>> &pares_de_caida, vector<int> &caidos){
 //6
 
 void ronda(int inicio, vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vector<int>> &optimo){
-    for(int i = inicio; i < caidos.size(); i++){
-        if(caidos[i] == 0)
+    for(int i = inicio; i < caidos.size() + inicio; i++){
+        if(caidos[i%n] == 0)
             continue;
-        if(BFS(i, pares_de_caida, caidos) != 0){
-            caidos[i] = 0;
-            optimo.back().push_back(i);
+
+        //si pudo visitar a alguien lo pusheo
+        if(BFS(i%n, pares_de_caida, caidos) != 0){
+            caidos[i%n] = 0;
+            optimo.back().push_back(i%n);
         }
-        if(!tiene_padre[i] && pares_de_caida[i].size() == 0)
-            optimo.back().push_back(i);
+
+        //es una componente conexa de un solo nodo
+        if(!tiene_padre[i%n] && pares_de_caida[i%n].size() == 0)
+            optimo.back().push_back(i%n);
     }
 }
 
 
 void domino(vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vector<int>> &optimo){
     for(int i = 0; i < n; i++){
+        //si tiene padre pero no tiene hijos no va a visitar a nadie
+        if(tiene_padre[i] && pares_de_caida[i].size() == 0)
+            continue;
+
         caidos.assign(n, 1);
         optimo.push_back({});
         ronda(i, pares_de_caida, caidos, optimo);
@@ -87,32 +99,37 @@ void domino(vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vec
 
 vector<vector<int>> procesarEntrada(string test_in, vector<bool> &tiene_padre){
     ifstream entrada;
+    vector<vector<int>> pares_de_caida(n);
+
     entrada.open(test_in);
+    if(!entrada.is_open()){
+        //falla
+    }
+
     entrada >> n >> m;
     tiene_padre.assign(n, 0);
-    vector<vector<int>> pares_de_caida(n);
+
     for(int i=0; i < m; ++i){
         int nodo1, nodo2;
         entrada >> nodo1 >> nodo2;
         pares_de_caida[nodo1 -1].push_back(nodo2-1);
         tiene_padre[nodo2-1] = true;
     }
+
     entrada.close();
+
     return pares_de_caida;
 }
 
 int main(int argc, char **argv){
     string test_in = argv[1];
-     cout <<tiene_padre.size()<< endl;
-    vector<vector<int>> pares_de_caida = procesarEntrada(test_in, tiene_padre);
-   
-    printVectorBool(tiene_padre);
     vector<int> caidos(n, 1);
     vector<vector<int>> optimo(0);
+    vector<vector<int>> pares_de_caida = procesarEntrada(test_in, tiene_padre);
+    
     domino(pares_de_caida, caidos, optimo);
     imprimirListaVectores(optimo);
-    cout << "--------------" << endl;
-    imprimirListaVectores(pares_de_caida);
+    //imprimirListaVectores(pares_de_caida);
     
     return 0;
 }

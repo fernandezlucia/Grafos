@@ -165,27 +165,18 @@ int main(int argc, char **argv){
     long long formas_ganar = 0;
     for(int i = 0; i < componentes.size(); i++){
         int k = componentes[i];
-        //cout << k << endl;
         if(k == 1)
             continue;
         else 
             formas_ganar += (k*(k-1))/2;
     }
     long long formas_jugar = (n*(n-1))/2;
-    //cout << formas_jugar << endl;
     double proba_perder = 1 - (formas_ganar / formas_jugar);
     cout << fixed;
     cout << setprecision(5);
     cout << proba_perder << endl;
     // proba de perder = 1 - (#formas de ganar / #formas de jugar)
 
-
-    //DFS(lista_de_ady, lista_de_ady[0][0], visitado, padre, componentes);
-    //printVector(esta_en_ciclo);
-    //imprimirListaVectores(contar_ciclos);
-    //printVector(time_in);
-    //imprimirListaVectores(res);
-    //imprimirListaVectores(lista_de_ady);
     return 0;
 }
 
