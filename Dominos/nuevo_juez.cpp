@@ -67,34 +67,37 @@ void BFS(int d, vector<vector<int>> &pares_de_caida, vector<int> &caidos){
 //6
 
 void ronda(int inicio, vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vector<int>> &optimo){
-    for(int i = inicio; i < caidos.size() + inicio; i++){
-        if(caidos[i%n] == 0)
-            continue;
 
         //si pudo visitar a alguien lo pusheo
-        BFS(i%n, pares_de_caida, caidos);
-        optimo.back().push_back(i%n);
-    }
+        BFS(inicio, pares_de_caida, caidos);
+        optimo.back().push_back(inicio);
 }
-
 
 void domino(vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vector<int>> &optimo){
     //no tiene sentido empezar bfs desde nodos que tengan padre, pues alguien los va a tirar
     //tampoco tiene sentido empezar bfs desde un nodo que no tiene padre
-    for(int i = 0; i < n && !tiene_padre[i]; i++){
-        if(pares_de_caida[i].size() == 0){
-            caidos[i];
+    caidos.assign(n, 1);
+    optimo.push_back({});
+    for(int i = 0; i < n; i++){
+        if(tiene_padre[i])
             continue;
-        }
-        caidos.assign(n, 1);
-        optimo.push_back({});
         ronda(i, pares_de_caida, caidos, optimo);
+    }
+
+    for(int i = 0; i < n; i++){
+        if(pares_de_caida[i].size() != 0 && caidos[i])
+            ronda(i, pares_de_caida, caidos, optimo);
     }
 }
 
+
 void menorConjOptimo(vector<vector<int>> &optimo){
     vector<int> menor_lex = optimo[0];
-
+   // imprimirListaVectores(optimo)
+    printVector(menor_lex);
+    sort(menor_lex.begin(), menor_lex.end());
+    printVector(menor_lex);
+    cout << "hola" << endl;
     for(int i = 1; i < optimo.size(); i++){
         if(optimo[i].size() < menor_lex.size()) 
             menor_lex = optimo[i];
@@ -108,7 +111,6 @@ void menorConjOptimo(vector<vector<int>> &optimo){
     cout << menor_lex.size() << endl;
     printVector(menor_lex);
 }
-
 vector<vector<int>> procesarEntrada(){
     cin >> n >> m;
     tiene_padre.assign(n, 0);
@@ -137,8 +139,3 @@ int main(){
     
     return 0;
 }
-
-//Diremos que un conjunto óptimo B1 es menor a otro B2 si B1 visto como secuencia ordenada es menor lexicográficamente que B2 visto como secuencia ordenada
-
-// test2-1 expected out:    3
-//                          1 4 7

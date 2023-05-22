@@ -5,13 +5,13 @@
 #include <math.h>
 #include <iomanip> 
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 
 int n;
 int m;
 
-int c;
 vector<bool> tiene_padre;
 
 void imprimirListaVectores(const vector<vector<int>>& lista) {
@@ -37,8 +37,9 @@ void printVectorBool(vector<bool> v){
     cout << endl;
 }
 
-int BFS(int d, vector<vector<int>> &pares_de_caida, vector<int> &caidos){
-    int hijos_caidos = 0;
+void BFS(int d, vector<vector<int>> &pares_de_caida, vector<int> &caidos){
+    //int hijos_caidos = 0;
+    caidos[d] = 0;
     queue<int> cola;
     cola.push(d);
 
@@ -50,13 +51,11 @@ int BFS(int d, vector<vector<int>> &pares_de_caida, vector<int> &caidos){
             if(caidos[v] == 0)
                 continue;  
             caidos[v] = 0;
-            hijos_caidos++;
+            //hijos_caidos++;
             //distancia[v] = distancia[d] + 1;
             cola.push(v);
         }
     }
-
-    return hijos_caidos;
 }
 //si todos sus hijos estaban caidos o si no tiene hijos no lo quiero pushear
 //si no puedo tirar a nadie y nadie me puede tirar, me tiro
@@ -68,45 +67,57 @@ int BFS(int d, vector<vector<int>> &pares_de_caida, vector<int> &caidos){
 //6
 
 void ronda(int inicio, vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vector<int>> &optimo){
-    for(int i = inicio; i < caidos.size() + inicio; i++){
-        if(caidos[i%n] == 0)
-            continue;
 
         //si pudo visitar a alguien lo pusheo
-        if(BFS(i%n, pares_de_caida, caidos) != 0){
-            caidos[i%n] = 0;
-            optimo.back().push_back(i%n);
-        }
-
-        //es una componente conexa de un solo nodo
-        if(!tiene_padre[i%n] && pares_de_caida[i%n].size() == 0)
-            optimo.back().push_back(i%n);
-    }
+        BFS(inicio, pares_de_caida, caidos);
+        optimo.back().push_back(inicio);
 }
-
 
 void domino(vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vector<int>> &optimo){
+    //no tiene sentido empezar bfs desde nodos que tengan padre, pues alguien los va a tirar
+    //tampoco tiene sentido empezar bfs desde un nodo que no tiene padre
+    caidos.assign(n, 1);
+    optimo.push_back({});
     for(int i = 0; i < n; i++){
-        //si tiene padre pero no tiene hijos no va a visitar a nadie
-        if(tiene_padre[i] && pares_de_caida[i].size() == 0)
+        if(tiene_padre[i])
             continue;
-
-        caidos.assign(n, 1);
-        optimo.push_back({});
         ronda(i, pares_de_caida, caidos, optimo);
+    }
+
+    for(int i = 0; i < n; i++){
+        if(pares_de_caida[i].size() != 0 && caidos[i])
+            ronda(i, pares_de_caida, caidos, optimo);
     }
 }
 
-vector<vector<int>> procesarEntrada(string test_in, vector<bool> &tiene_padre){
-    ifstream entrada;
-    vector<vector<int>> pares_de_caida(n);
+void menorConjOptimo(vector<vector<int>> &optimo){
+    vector<int> menor_lex = optimo[0];
+   // imprimirListaVectores(optimo);
 
-    entrada.open(test_in);
-    if(!entrada.is_open()){
-        //falla
+    sort(menor_lex.begin(), menor_lex.end());
+
+
+    for(int i = 1; i < optimo.size(); i++){
+        if(optimo[i].size() < menor_lex.size()) 
+            menor_lex = optimo[i];
+        else if(optimo[i].size() == menor_lex.size()){
+            sort(optimo[i].begin(), optimo[i].end());
+            if(optimo[i] < menor_lex)
+                menor_lex = optimo[i];
+        }
     }
 
+    cout << menor_lex.size() << endl;
+    printVector(menor_lex);
+}
+
+
+vector<vector<int>> procesarEntrada(string test_in){
+    ifstream entrada;
+
+    entrada.open(test_in);
     entrada >> n >> m;
+    vector<vector<int>> pares_de_caida(n);
     tiene_padre.assign(n, 0);
 
     for(int i=0; i < m; ++i){
@@ -125,10 +136,12 @@ int main(int argc, char **argv){
     string test_in = argv[1];
     vector<int> caidos(n, 1);
     vector<vector<int>> optimo(0);
-    vector<vector<int>> pares_de_caida = procesarEntrada(test_in, tiene_padre);
-    
+    vector<vector<int>> pares_de_caida = procesarEntrada(test_in);
+
     domino(pares_de_caida, caidos, optimo);
-    imprimirListaVectores(optimo);
+    //imprimirListaVectores(optimo);
+
+    menorConjOptimo(optimo);
     //imprimirListaVectores(pares_de_caida);
     
     return 0;
