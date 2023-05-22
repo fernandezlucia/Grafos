@@ -76,11 +76,14 @@ void ronda(int inicio, vector<vector<int>> &pares_de_caida, vector<int> &caidos,
         if(BFS(i%n, pares_de_caida, caidos) != 0){
             caidos[i%n] = 0;
             optimo.back().push_back(i%n);
+        } else {
+            //si no tiro a nadie y no tiene padre, entonces nadie lo puede tirar
+            //si no tiro a nadie y tiene padre, entonces alguien lo va a tirar
+            if(!tiene_padre[i%n]){
+                optimo.back().push_back(i%n);
+                caidos[i%n] = 0;
+            }
         }
-
-        //es una componente conexa de un solo nodo
-        if(!tiene_padre[i%n] && pares_de_caida[i%n].size() == 0)
-            optimo.back().push_back(i%n);
     }
 }
 
@@ -88,9 +91,6 @@ void ronda(int inicio, vector<vector<int>> &pares_de_caida, vector<int> &caidos,
 void domino(vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vector<int>> &optimo){
     for(int i = 0; i < n; i++){
         //si tiene padre pero no tiene hijos no va a visitar a nadie
-        if(tiene_padre[i] && pares_de_caida[i].size() == 0)
-            continue;
-
         caidos.assign(n, 1);
         optimo.push_back({});
         ronda(i, pares_de_caida, caidos, optimo);
@@ -98,31 +98,23 @@ void domino(vector<vector<int>> &pares_de_caida, vector<int> &caidos, vector<vec
 }
 
 
-void menorConjOptimo(vector<vector<int>> optimo){
-    vector<int> menor_lex(0);
-    int menor_size = n;
+void menorConjOptimo(vector<vector<int>> &optimo){
+    vector<int> menor_lex = optimo[0];
 
-    for(int i = 0; i < optimo.size(); i++){
-        if(optimo[i].size() < menor_size)
-            menor_size = optimo[i].size();
-    }
-
-    for(int i = 0; i < optimo.size(); i++){
-        if(optimo[i].size() == menor_size){
+    for(int i = 1; i < optimo.size(); i++){
+        if((optimo[i].size() < menor_lex.size()) || (optimo[i].size() == menor_lex.size() && optimo[i] < menor_lex))
             menor_lex = optimo[i];
-            break;
-        }
     }
-    
-    cout << menor_size << endl;
+
+    cout << menor_lex.size() << endl;
     printVector(menor_lex);
 }
 
 vector<vector<int>> procesarEntrada(){
     cin >> n >> m;
-    vector<vector<int>> pares_de_caida(n);
     tiene_padre.assign(n, 0);
 
+    vector<vector<int>> pares_de_caida(n);
     for(int i=0; i < m; ++i){
         int nodo1, nodo2;
         cin >> nodo1 >> nodo2;
@@ -132,6 +124,7 @@ vector<vector<int>> procesarEntrada(){
 
     return pares_de_caida;
 }
+
 
 int main(){
     vector<vector<int>> pares_de_caida = procesarEntrada();
