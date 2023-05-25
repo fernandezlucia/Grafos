@@ -4,15 +4,13 @@
 #include <stdio.h>
 #include <math.h>
 #include <iomanip> 
-//#include <queue>
 #include <algorithm>
 #include <tuple>
 
 using namespace std;
 
 int c;
-int cant_oficinas, cant_modems, costo_UTP_metros, costo_fibra_metros;
-double costo_UTP_cm, costo_fibra_cm, cota_UTP_cm;
+int cant_oficinas, cant_modems, costo_UTP_metros, costo_fibra_metros, cota_UTP_metros;
 double gasto_UTP = 0.0;
 double gasto_fibra = 0.0;
 vector<tuple<double, double>> res(0);
@@ -33,18 +31,17 @@ void imprimirVectorDeTuplasDobles(const vector<pair<int, int>>& vectorTuplas){
         int elemento1 = get<0>(tupla);
         int elemento2 = get<1>(tupla);
 
-        cout << setprecision(3) << fixed;
         cout << "(" << elemento1 << ", " << elemento2 << ")" << endl;
     }
 }
 
 bool compararTuplas(const tuple<int, int, double>& tupla1, const tuple<int, int, double>& tupla2){
-    return get<2>(tupla1) < get<2>(tupla2);  //compara las distancias entre oficinas 
+    return get<2>(tupla1) < get<2>(tupla2); 
 }
 
 void ordenarVectorDeTuplas(std::vector<std::tuple<int, int, double>>& vectorTuplas){
     sort(vectorTuplas.begin(), vectorTuplas.end(), compararTuplas);  
-}  //ordena el vector de tuplas (nodo1, nodo2, dist) por distancias, de menor a mayor
+} 
 
 
 // DISJOINT UNION SET de la practica
@@ -79,8 +76,6 @@ struct DSU{
 
 
 double distanciaEuclideana(pair<int, int> a, pair<int, int> b){
-    //double dist = sqrt(pow(b.first - a.first, 2) + pow(b.second - a.second, 2));
-    //cout << "distancia entre " << a.first << " " << a.second << " y " << b.first << " " << b.second << " es " << dist << endl;
     return sqrt(pow(b.first - a.first, 2) + pow(b.second - a.second, 2));
 }
 
@@ -106,16 +101,13 @@ void ponerModems(vector<tuple<int, int, double>> &AGM){
     cant_modems--;
     int longitud = AGM.size()-1;
     for(int i = longitud; i > longitud-cant_modems; i--){
-        if(get<2>(AGM[i]) <= cota_UTP_cm){
-            gasto_UTP -= get<2>(AGM[i])*costo_UTP_cm;
+        if(get<2>(AGM[i]) <= cota_UTP_metros){
+            gasto_UTP -= get<2>(AGM[i])*costo_UTP_metros;
         } else{
-            gasto_fibra -= get<2>(AGM[i])*costo_fibra_cm;
+            gasto_fibra -= get<2>(AGM[i])*costo_fibra_metros;
         }
         AGM.pop_back();
     }
-
-    //cout << gasto_UTP << " " << gasto_fibra  << endl;
-    //imprimirVectorDeTuplas(AGM);
 }
 
 
@@ -123,8 +115,6 @@ void ponerModems(vector<tuple<int, int, double>> &AGM){
 vector<tuple<int, int, double>> kruskal(vector<tuple<int, int, double>> &distancias){
     ordenarVectorDeTuplas(distancias);  
     vector<tuple<int, int, double>> AGM(0);
-    //cout << " dist ordenadas: " << endl;
-    //imprimirVectorDeTuplas(distancias);
 
     DSU dsu(cant_oficinas);  
     
@@ -136,14 +126,11 @@ vector<tuple<int, int, double>> kruskal(vector<tuple<int, int, double>> &distanc
 
         if(dsu.find(nodo_a) != dsu.find(nodo_b)){  
             // agregar
-            //cout << "costo_UTP_cm: " << costo_UTP_cm << endl;
-            if(distancia_entre_ofis <= cota_UTP_cm){
-                gasto_UTP += costo_UTP_cm * distancia_entre_ofis; //pongo cables utp
-                //cout << "gasto UTP: " << gasto_UTP << endl;
+            if(distancia_entre_ofis <= cota_UTP_metros){
+                gasto_UTP += costo_UTP_metros * distancia_entre_ofis; 
             }
             else{
-                gasto_fibra += costo_fibra_cm*distancia_entre_ofis;//pongo cables de fibra optica
-                //cout << "gasto fibra: " << gasto_fibra << endl;
+                gasto_fibra += costo_fibra_metros*distancia_entre_ofis;
             }
 
             dsu.unite(nodo_a, nodo_b);
@@ -155,51 +142,35 @@ vector<tuple<int, int, double>> kruskal(vector<tuple<int, int, double>> &distanc
 }
 
 void procesarEntrada(){
-    //ifstream entrada;
-    //int c;
-
-    //entrada.open(test_in);
     cin >> c;
 
     for(int i = 0; i < c; i++){
-        cin >> cant_oficinas >> cota_UTP_cm >> cant_modems >> costo_UTP_metros >> costo_fibra_metros;   
+        cin >> cant_oficinas >> cota_UTP_metros >> cant_modems >> costo_UTP_metros >> costo_fibra_metros;   
 
         gasto_UTP = 0.0;
         gasto_fibra = 0.0;
-
-        costo_UTP_cm = costo_UTP_metros / 100.0;  //costo por cm
-        costo_fibra_cm = costo_fibra_metros / 100.0;  //costo por cm
-
          
-        vector<pair<int, int>> posicion(cant_oficinas);  // posicion x y de cada oficina en el eje cartesiano
-        vector<tuple<int, int, double>> distancias;  //distancias entre todos los nodos uno a uno
-        vector<tuple<int, int, double>> AGM;  // AGM = se usa para guardar lo que devuelve kruskal
+        vector<pair<int, int>> posicion(cant_oficinas); 
+        vector<tuple<int, int, double>> distancias;  
+        vector<tuple<int, int, double>> AGM;  
 
         for(int k = 0; k < cant_oficinas; k++){
             int x, y;
             cin >> x >> y;
-            pair<int, int> posicion_i = make_pair(x, y);
-            posicion[k] = posicion_i;
+            pair<int, int> posicion_k = make_pair(x, y);
+            posicion[k] = posicion_k;
         }
-        
-        //imprimirVectorDeTuplasDobles(posicion);
 
         distancias = calcularDistancias(posicion);
         AGM = kruskal(distancias);
         ponerModems(AGM);
     
-        pair<double, double> res1 = make_pair(gasto_UTP*100, gasto_fibra*100);
+        pair<double, double> res1 = make_pair(gasto_UTP, gasto_fibra);
         res.push_back(res1);
-        //cout << setprecision(3) << fixed;
-        //cout << "Caso #" << i+1 << ": " << gasto_UTP*100 << " " << gasto_fibra*100 << endl;
-
     }
-    //entrada.close();
 }
 
 int main(){
-    //string test_in = argv[1];
-    
     procesarEntrada();
 
     int f=1;
@@ -209,11 +180,8 @@ int main(){
 
         cout << setprecision(3) << fixed;
         cout << "Caso #" << f << ": " << elemento1 << " " << elemento2 << endl;
-        //cout << "(" << elemento1 << ", " << elemento2 << ")" << endl;
         f++;
         }
-    
-
 
     return 0;
 }
