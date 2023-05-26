@@ -8,28 +8,10 @@
 #include <algorithm>
 
 using namespace std;
-int cant_oficinas, cant_modems, cota_UTP, costo_UTP, costo_fibra;
-double gasto_UTP = 0;
-double gasto_fibra = 0;
 
+////////////////////////// variables //////////////////////////
 
-void imprimirVectorDeTuplas(const std::vector<std::tuple<int, int, double>>& vectorTuplas){
-    for (const auto& tupla : vectorTuplas){
-        int elemento1 = std::get<0>(tupla);
-        int elemento2 = std::get<1>(tupla);
-        double elemento3 = std::get<2>(tupla);
-
-        std::cout << "(" << elemento1 << ", " << elemento2 << ", " << elemento3 << ")" << std::endl;
-    }
-}
-
-bool compararTuplas(const std::tuple<int, int, double>& tupla1, const std::tuple<int, int, double>& tupla2){
-    return std::get<2>(tupla1) < std::get<2>(tupla2);
-}
-
-void ordenarVectorDeTuplas(std::vector<std::tuple<int, int, double>>& vectorTuplas){
-    std::sort(vectorTuplas.begin(), vectorTuplas.end(), compararTuplas);
-}
+typedef tuple<int, int, double> arista;
 
 struct DSU{
     DSU(int n){
@@ -49,115 +31,173 @@ struct DSU{
         if(u == v) 
             return;
         
-        if(rank[u] < rank[v]) 
+        if(rank[u] < rank[v])
             swap(u,v);
         
         padre[v] = padre[u];
         rank[u] = max(rank[u],rank[v]+1);
     }
 
-    vector<int> padre;
-    vector<int> rank;
+    vector<int> padre, rank;
 };
 
+int cant_oficinas, cant_modems;
+double costo_UTP, costo_fibra, cota_UTP;
+double gasto_UTP, gasto_fibra;
 
-double distanciaEuclideana(pair<int, int> a, pair<int, int> b){
-    return sqrt(pow(b.first - a.first, 2) + pow(b.second - a.second, 2));
+////////////////////////// auxiliares //////////////////////////
+
+void imprimirVectorDeTuplas(const vector<arista>& vectorTuplas){
+    for (const auto& tupla : vectorTuplas){
+        int elemento1 = get<0>(tupla);
+        int elemento2 = get<1>(tupla);
+        double elemento3 = get<2>(tupla);
+
+        cout << "(" << elemento1 << ", " << elemento2 << ", " << elemento3 << ")" << endl;
+    }
 }
 
-//recorrer la matriz triangularmente
-vector<tuple<int, int, double>> calcularDistancias(vector<pair<int, int>> &posiciones){
-vector<tuple<int, int, double>> distancias(0);
-pair<int, int> posicion_i;
-pair<int, int> posicion_j;
+////////////////////////// distancias //////////////////////////
 
-    for(int i = 0; i < posiciones.size(); i++){
-        posicion_i = posiciones[i];
-        for(int j = i+1; j < posiciones.size(); j++){
-            posicion_j = posiciones[j];
-            tuple<int, int, double> arista = make_tuple(i, j, distanciaEuclideana(posicion_i, posicion_j));
-            distancias.push_back(arista);
+double distanciaEuclideana(pair<double, double> a, pair<double, double> b){
+    return sqrt((b.first - a.first)*(b.first - a.first) + (b.second - a.second)*(b.second - a.second));
+}
+void imprimirVectorAUX(const std::vector<std::tuple<int, int, int>>& vectorTuplas) {
+    for (const auto& tupla : vectorTuplas) {
+        int elemento1 = std::get<0>(tupla);
+        int elemento2 = std::get<1>(tupla);
+        int elemento3 = std::get<2>(tupla);
+
+        std::cout << "(" << elemento1 << ", " << elemento2 << ", " << elemento3 << ")" << std::endl;
+    }
+}
+void calcularDistanciaCables(vector<pair<double, double>> &posicion_oficinas, vector<arista> &cables){
+    vector<tuple<int, int, int>> aux;
+    for(int i = 0; i < posicion_oficinas.size(); i++){
+        pair<int, int> pos_oficina_i = posicion_oficinas[i];
+        aux.push_back(make_tuple(i, pos_oficina_i.first, pos_oficina_i.second));
+        for(int j = i + 1; j < posicion_oficinas.size(); j++){
+            pair<int, int> pos_oficina_j = posicion_oficinas[j];
+
+            cables.push_back(make_tuple(i, j, distanciaEuclideana(pos_oficina_i, pos_oficina_j)));
         }
     }
-    return distancias;
+    //imprimirVectorAUX(aux);\
+    cout << "------------------" << endl;
 }
 
+////////////////////////// kruskal //////////////////////////
 
-void ponerModems(vector<tuple<int, int, double>> &AGM){
-    cant_modems--;
-    
-    int longitud = AGM.size()-1;
-    for(int i = longitud; i > longitud-cant_modems; i--){
-        if(get<2>(AGM[i]) <= cota_UTP)
-            gasto_UTP -= get<2>(AGM[i])*costo_UTP;
-        else
-            gasto_fibra -= get<2>(AGM[i])*costo_fibra;
-        AGM.pop_back();
-    }
-
-    cout << gasto_UTP << " " << gasto_fibra  << endl;
-    imprimirVectorDeTuplas(AGM);
+bool compararAristas(const arista& tupla1, const arista& tupla2){
+    return get<2>(tupla1) < get<2>(tupla2);
 }
 
-
-
-vector<tuple<int, int, double>> kruskal(vector<tuple<int, int, double>> &distancias){
-    ordenarVectorDeTuplas(distancias);
-    vector<tuple<int, int, double>> AGM(0);
+void kruskal(vector<arista> &cables, vector<arista> &AGM){
+    sort(cables.begin(), cables.end(), compararAristas);
 
     DSU dsu(cant_oficinas);
     
-    for(auto nodo : distancias){
-        //si (a, b) es arista segura
-        int nodo_a = get<0>(nodo);
-        int nodo_b = get<1>(nodo);
-        double distancia_entre_ofis = get<2>(nodo);
+    for(arista cable : cables){
 
-        if(dsu.find(nodo_a) != dsu.find(nodo_b)){
-            // agregar
+        int oficina_a = get<0>(cable);
+        int oficina_b = get<1>(cable);
+        double distancia_entre_ofis = get<2>(cable);
+
+        //si a no conecta con b
+        if(dsu.find(oficina_a) != dsu.find(oficina_b)){
+            //sumar a gastos
             if(distancia_entre_ofis <= cota_UTP)
-                gasto_UTP += costo_UTP*distancia_entre_ofis; //pongo cables utp
-            else    
-                gasto_fibra += costo_fibra*distancia_entre_ofis;//pongo cables de fibra optica
+                gasto_UTP += costo_UTP * distancia_entre_ofis;
+            else 
+                gasto_fibra += costo_fibra * distancia_entre_ofis;
 
-            dsu.unite(nodo_a, nodo_b);
-            AGM.push_back(nodo);
+            //conectar oficinas
+            dsu.unite(oficina_a, oficina_b);
+
+            //agregar cable
+            AGM.push_back(cable);
         }
     }
-
-    return AGM;
 }
 
-void procesarEntrada(string test_in){
-    ifstream entrada;
+////////////////////////// poner modems //////////////////////////
+
+void ponerModems(vector<arista> &AGM, int test){
+    double distancia_entre_ofis;
+
+    //por cada modem adicional al primero
+    for(int i = 1; i < cant_modems; i++){
+        // obtener cable mas caro (esta ordenado)
+        distancia_entre_ofis = get<2>(AGM[AGM.size()-1]);
+
+        //saco costo del cable
+        if(distancia_entre_ofis <= cota_UTP)
+            gasto_UTP -= costo_UTP*distancia_entre_ofis;
+        else 
+            gasto_fibra -= costo_fibra*distancia_entre_ofis;
+
+        //saco cable
+        AGM.pop_back();
+    }
+
+    //output
+    cout << fixed << setprecision(3) << "Caso #" << test+1 << ": " << gasto_UTP << " " << gasto_fibra << endl;
+}
+
+////////////////////////// main //////////////////////////
+
+int main(int argc, char** argv){
+    string test_nombre = "";
+    ifstream archivo;
     int c;
+    double x, y;
+    
+    //si hay parametro, es archivo de tests
+    if (argc > 1){
+        test_nombre = argv[1];
+        archivo.open(test_nombre);
+    }
 
-    entrada.open(test_in);
-    entrada >> c;
+    //obtener cantidad de tests
+    if(test_nombre.empty())
+        std :: cin >> c;
+    else
+        archivo >> c;
 
+    //por cada test
     for(int i = 0; i < c; i++){
-        entrada >> cant_oficinas >> cota_UTP >> cant_modems >> costo_UTP >> costo_fibra;   
-         
-        vector<pair<int, int>> posicion(cant_oficinas);
-        vector<tuple<int, int, double>> distancias;
-        vector<tuple<int, int, double>> AGM;
+        //leer datos importantes del test
+        if(test_nombre.empty())
+            std :: cin >> cant_oficinas >> cota_UTP >> cant_modems >> costo_UTP >> costo_fibra;
+        else
+            archivo >> cant_oficinas >> cota_UTP >> cant_modems >> costo_UTP >> costo_fibra;
 
-        for(int i = 0; i < cant_oficinas; i++){
-            int x, y;
-            entrada >> x >> y;
-            pair<int, int> posicion_i = make_pair(x, y);
-            posicion[i] = posicion_i;
+        //creamos estructuras para algoritmos
+        vector<pair<double, double>> posicion(cant_oficinas);
+        vector<arista> cables;
+        vector<arista> AGM;
+        
+        //reseteamos
+        gasto_fibra = 0; 
+        gasto_UTP = 0;
+
+        for(int j = 0; j < cant_oficinas; j++){
+            //leer posicion de nodos
+            if(test_nombre.empty())
+                std :: cin >> x >> y;
+            else
+                archivo >> x >> y;
+
+            posicion[j] = make_pair(x, y);
         }
 
-        distancias = calcularDistancias(posicion);
-        AGM = kruskal(distancias);
-        ponerModems(AGM);
+        //calculamos aristas (cables entre officinas)
+        calcularDistanciaCables(posicion, cables);
+        //imprimirVectorDeTuplas(cables);
+        //resolver
+        kruskal(cables, AGM);
+        ponerModems(AGM, i);
     }
-    entrada.close();
-}
 
-int main(int argc, char **argv){
-    string test_in = argv[1];
-    procesarEntrada(test_in);
     return 0;
 }

@@ -15,7 +15,6 @@ double gasto_UTP = 0.0;
 double gasto_fibra = 0.0;
 vector<tuple<double, double>> res(0);
 
-
 void imprimirVectorDeTuplas(const vector<tuple<int, int, double>>& vectorTuplas){
     for (const auto& tupla : vectorTuplas){
         int elemento1 = get<0>(tupla);
@@ -96,7 +95,6 @@ vector<tuple<int, int, double>> calcularDistancias(vector<pair<int, int>> &posic
     return distancias;
 }
 
-
 void ponerModems(vector<tuple<int, int, double>> &AGM){
     cant_modems--;
     int longitud = AGM.size()-1;
@@ -109,8 +107,6 @@ void ponerModems(vector<tuple<int, int, double>> &AGM){
         AGM.pop_back();
     }
 }
-
-
 
 vector<tuple<int, int, double>> kruskal(vector<tuple<int, int, double>> &distancias){
     ordenarVectorDeTuplas(distancias);  
