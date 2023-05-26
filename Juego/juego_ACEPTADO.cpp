@@ -76,13 +76,6 @@ void detectarComponentes(vector<vector<int>> &lista_de_ady, vector<int> &visitad
     }
 }
 
-void printVector(vector<int> v){
-    for (const auto& elem : v) {
-        cout << elem << " ";
-    }
-    cout << endl;
-}
-
 int main(){
     cin >> n >> m;
 
