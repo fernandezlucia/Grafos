@@ -11,7 +11,7 @@ using namespace std;
 
 ////////////////////////// variables //////////////////////////
 
-typedef tuple<int, int, double> arista;
+typedef tuple<int, int, long double> arista;
 
 struct DSU{
     DSU(int n){
@@ -42,36 +42,16 @@ struct DSU{
 };
 
 int cant_oficinas, cant_modems;
-double costo_UTP, costo_fibra, cota_UTP;
-double gasto_UTP, gasto_fibra;
-
-////////////////////////// auxiliares //////////////////////////
-
-void imprimirVectorDeTuplas(const vector<arista>& vectorTuplas){
-    for (const auto& tupla : vectorTuplas){
-        int elemento1 = get<0>(tupla);
-        int elemento2 = get<1>(tupla);
-        double elemento3 = get<2>(tupla);
-
-        cout << "(" << elemento1 << ", " << elemento2 << ", " << elemento3 << ")" << endl;
-    }
-}
+long double costo_UTP, costo_fibra, cota_UTP;
+long double gasto_UTP, gasto_fibra;
 
 ////////////////////////// distancias //////////////////////////
 
-double distanciaEuclideana(pair<double, double> a, pair<double, double> b){
+double distanciaEuclideana(pair<long double, long double> a, pair<long double, long double> b){
     return sqrt((b.first - a.first)*(b.first - a.first) + (b.second - a.second)*(b.second - a.second));
 }
-void imprimirVectorAUX(const std::vector<std::tuple<int, int, int>>& vectorTuplas) {
-    for (const auto& tupla : vectorTuplas) {
-        int elemento1 = std::get<0>(tupla);
-        int elemento2 = std::get<1>(tupla);
-        int elemento3 = std::get<2>(tupla);
 
-        std::cout << "(" << elemento1 << ", " << elemento2 << ", " << elemento3 << ")" << std::endl;
-    }
-}
-void calcularDistanciaCables(vector<pair<double, double>> &posicion_oficinas, vector<arista> &cables){
+void calcularDistanciaCables(vector<pair<long double, long double>> &posicion_oficinas, vector<arista> &cables){
     vector<tuple<int, int, int>> aux;
     for(int i = 0; i < posicion_oficinas.size(); i++){
         pair<int, int> pos_oficina_i = posicion_oficinas[i];
@@ -82,8 +62,6 @@ void calcularDistanciaCables(vector<pair<double, double>> &posicion_oficinas, ve
             cables.push_back(make_tuple(i, j, distanciaEuclideana(pos_oficina_i, pos_oficina_j)));
         }
     }
-    //imprimirVectorAUX(aux);\
-    cout << "------------------" << endl;
 }
 
 ////////////////////////// kruskal //////////////////////////
@@ -101,7 +79,7 @@ void kruskal(vector<arista> &cables, vector<arista> &AGM){
 
         int oficina_a = get<0>(cable);
         int oficina_b = get<1>(cable);
-        double distancia_entre_ofis = get<2>(cable);
+        long double distancia_entre_ofis = get<2>(cable);
 
         //si a no conecta con b
         if(dsu.find(oficina_a) != dsu.find(oficina_b)){
@@ -123,7 +101,7 @@ void kruskal(vector<arista> &cables, vector<arista> &AGM){
 ////////////////////////// poner modems //////////////////////////
 
 void ponerModems(vector<arista> &AGM, int test){
-    double distancia_entre_ofis;
+    long double distancia_entre_ofis;
 
     //por cada modem adicional al primero
     for(int i = 1; i < cant_modems; i++){
@@ -173,7 +151,7 @@ int main(int argc, char** argv){
             archivo >> cant_oficinas >> cota_UTP >> cant_modems >> costo_UTP >> costo_fibra;
 
         //creamos estructuras para algoritmos
-        vector<pair<double, double>> posicion(cant_oficinas);
+        vector<pair<long double, long double>> posicion(cant_oficinas);
         vector<arista> cables;
         vector<arista> AGM;
         
@@ -193,7 +171,6 @@ int main(int argc, char** argv){
 
         //calculamos aristas (cables entre officinas)
         calcularDistanciaCables(posicion, cables);
-        //imprimirVectorDeTuplas(cables);
         //resolver
         kruskal(cables, AGM);
         ponerModems(AGM, i);
