@@ -6,6 +6,7 @@
 #include <iomanip> 
 #include <queue>
 #include <algorithm>
+#include <tuple>
 
 using namespace std;
 
