@@ -15,38 +15,31 @@ using namespace std;
 
 typedef tuple<int, int, long double> arista;
 
-struct DSU{
-    DSU(int n){
-        padre = rank = vector<int>(n);
-        for(int v = 0; v < n; v++) 
-            padre[v] = v;
-    }
-
-    int find(int v){
-        if(v == padre[v]) 
-            return v;
-        return padre[v] = find(padre[v]);
-    }
-
-    void unite(int u, int v){
-        u = find(u);
-        v = find(v);
-        if(u == v) 
-            return;
-        
-        if(rank[u] < rank[v])
-            swap(u,v);
-        
-        padre[v] = padre[u];
-        rank[u] = max(rank[u],rank[v]+1);
-    }
-
-    vector<int> padre, rank;
-};
-
 int cant_oficinas, cant_modems;
 long double costo_UTP, costo_fibra, cota_UTP;
 long double gasto_UTP, gasto_fibra;
+
+struct DSU {
+  DSU(int size) : parent(size) {
+    for (int i = 0; i < size; ++i)
+      parent[i] = i;
+  }
+
+  int find(int x) {
+    if (parent[x] != x)
+      return find(parent[x]);
+    return x;
+  }
+
+  void unite(int x, int y) {
+    int rootX = find(x);
+    int rootY = find(y);
+    if (rootX != rootY)
+      parent[rootX] = rootY;
+  }
+
+  vector<int> parent;
+};
 
 ////////////////////////// distancias //////////////////////////
 

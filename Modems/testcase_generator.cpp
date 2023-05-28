@@ -25,7 +25,7 @@ int main(int argc, char** argv){
     mt19937 gen(rd());
 
     for(int i = 0; i < c; i++){
-        uniform_int_distribution<int> random_N(1, 100);
+        uniform_int_distribution<int> random_N(100, 1000);
         uniform_int_distribution<int> random_R(1, 10000);
         uniform_int_distribution<int> random_V(1, 10);
         N = random_N(gen);
