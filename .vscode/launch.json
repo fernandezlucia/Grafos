@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/lucia/Desktop/Facultad/Algoritmos3/TP2/Juego",
-      "program": "/home/lucia/Desktop/Facultad/Algoritmos3/TP2/Juego/build/Debug/outDebug",
+      "cwd": "/home/lucia/Desktop/Facultad/Algoritmos3/TP2/Modems",
+      "program": "/home/lucia/Desktop/Facultad/Algoritmos3/TP2/Modems/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

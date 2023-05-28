@@ -129,13 +129,14 @@ int main(int argc, char** argv){
     string test_nombre = "";
     ifstream archivo;
     int c;
-    double x, y;
+    long double x, y;
     
     //si hay parametro, es archivo de tests
     if (argc > 1){
         test_nombre = argv[1];
         archivo.open(test_nombre);
     }
+
 
     //obtener cantidad de tests
     if(test_nombre.empty())
