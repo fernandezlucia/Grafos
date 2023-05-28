@@ -90,4 +90,4 @@ int main(int argc, char **argv){
 //(1,7) (3,10) (3,2) (8,11)
 // si un ciclo comparte al menos un nodo con otro ciclo -> sumo la cantidad de nodos en esos ciclos en k
 // combinatorio (k 2)
-tengo la cantidad de nodos en ciclos
+//tengo la cantidad de nodos en ciclos
