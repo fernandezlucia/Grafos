@@ -1,0 +1,11 @@
+EJERCICIO 1:
+g++ Fernandez-Giri-Ej1.cpp -o Ej1
+./Ej1
+
+EJERCICIO 2:
+g++ Fernandez-Giri-Ej2.cpp -o Ej2
+./Ej2
+
+EJERCICIO 3:
+g++ Fernandez-Giri-Ej3.cpp -o Ej3
+./Ej3
